@@ -1,0 +1,792 @@
+{
+  "name": "Jewelry Marketing",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "0aa986e1-3e61-40a4-a12e-e93340f2f7d3",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -336,
+        -384
+      ],
+      "id": "3f291c82-06cb-4ed8-b7fe-3a92ddfee79c",
+      "name": "Webhook",
+      "webhookId": "0aa986e1-3e61-40a4-a12e-e93340f2f7d3"
+    },
+    {
+      "parameters": {
+        "url": "=https://bcbpwpqknmmexkigsxpm.supabase.co/storage/v1/object/public/image/{{ $json.body.record.name }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "image"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -144,
+        -384
+      ],
+      "id": "ed544117-7057-4bdb-9a99-9e7926718d26",
+      "name": "Get Image"
+    },
+    {
+      "parameters": {
+        "content": "## Get Image\n",
+        "height": 560,
+        "width": 416,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -416,
+        -464
+      ],
+      "typeVersion": 1,
+      "id": "e2c5a965-5276-4d2f-b874-ffb406ec77b5",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro"
+        },
+        "text": "=You are a jewelry expert.\nAnalyze this image and describe:\n1. Jewelry type\n2. Material & color\n3. Emotional appeal\n4. Ideal usage occasion\nKeep it concise but vivid.",
+        "inputType": "binary",
+        "binaryPropertyName": "image",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        192,
+        -384
+      ],
+      "id": "cb106f42-8eec-4269-b234-e75e5391960d",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "EiV9BLBLpTSPEXh1",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Analyse Image\n",
+        "height": 560,
+        "width": 288,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        32,
+        -464
+      ],
+      "typeVersion": 1,
+      "id": "8400dc5b-808b-4c8c-a74f-494ffdb3fb67",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Prompt Generator \n",
+        "height": 560,
+        "width": 784,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        352,
+        -464
+      ],
+      "typeVersion": 1,
+      "id": "518ec12b-6b25-47a9-b17f-50a0a3ef903f",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=personas",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        624,
+        -384
+      ],
+      "id": "d71b6476-c1e4-48e2-ae7e-aa570ebd2b2b",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"personas\": [\n    {\n      \"id\": 1,\n      \"name\": \"Luxury Bride\",\n      \"tone\": \"Elegant, emotional\",\n      \"goal\": \"Wedding jewelry aspiration\"\n    },\n    {\n      \"id\": 2,\n      \"name\": \"Gen Z Trendsetter\",\n      \"tone\": \"Bold, trendy, fast\",\n      \"goal\": \"Fashion statement\"\n    },\n    {\n      \"id\": 3,\n      \"name\": \"Minimalist Professional\",\n      \"tone\": \"Clean, classy\",\n      \"goal\": \"Everyday premium wear\"\n    },\n    {\n      \"id\": 4,\n      \"name\": \"Festive Buyer\",\n      \"tone\": \"Cultural, emotional\",\n      \"goal\": \"Festival & tradition\"\n    },\n    {\n      \"id\": 5,\n      \"name\": \"Gift Buyer (Male)\",\n      \"tone\": \"Emotional, reassuring\",\n      \"goal\": \"Perfect gift decision\"\n    }\n  ]\n}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        -384
+      ],
+      "id": "a9d95f1a-ee23-458a-bca8-9024b095a4ef",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        704,
+        -176
+      ],
+      "id": "50c00fc0-3b4c-41ae-8eaf-f950d6e32611",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "EiV9BLBLpTSPEXh1",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "##  Short Video Genrator\n",
+        "height": 560,
+        "width": 1488,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1168,
+        -464
+      ],
+      "typeVersion": 1,
+      "id": "4af23df0-ee59-4988-b3f6-aa7dc5902fd6",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6e9fbe2d-6636-4df2-8054-811f855d376d",
+              "name": "PROJECT_ID",
+              "value": "gen-lang-client-0494102051",
+              "type": "string"
+            },
+            {
+              "id": "1e65c4b0-c7c0-4876-a710-0b720931e3f6",
+              "name": "LOCATION_ID",
+              "value": "us-central1",
+              "type": "string"
+            },
+            {
+              "id": "0bef756a-6e2a-434f-9f42-ff4a74a1de64",
+              "name": "API_ENDPOINT",
+              "value": "us-central1-aiplatform.googleapis.com",
+              "type": "string"
+            },
+            {
+              "id": "30431164-1a3f-4194-92aa-5c966bd87e54",
+              "name": "MODEL_ID",
+              "value": "veo-3.1-generate-preview",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1248,
+        -384
+      ],
+      "id": "d73ddac9-5ecd-4f4c-b708-88d7a061d101",
+      "name": "Configure me"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "acc5846c-f85a-49d8-9e31-00a77714332f",
+              "name": "URL",
+              "value": "=https://{{ $json.API_ENDPOINT }}/v1/projects/{{ $json.PROJECT_ID }}/locations/{{ $json.LOCATION_ID }}/publishers/google/models/{{ $json.MODEL_ID }}:predictLongRunning",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1408,
+        -384
+      ],
+      "id": "a6916105-08f4-4315-88bb-c24bce497fab",
+      "name": "Setup workflow"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.URL }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "JSON",
+        "body": "={\n  \"instances\": [\n    {\n      \"inputs\": [\n        {\n          \"image\": {\n            \"bytesBase64Encoded\": \"{{ $('Code in JavaScript').item.json.imageBase64 }}\",\n            \"mimeType\": \"{{ $('Code in JavaScript').item.json.mimeType }}\"\n          }\n        }\n      ],\n      \"prompt\": \"{{ $('Short Video Content').item.json.output }}\" ,\n      \"videoConfig\": {\n        \"durationSeconds\": 15,\n        \"aspectRatio\": \"9:16\",\n        \"fps\": 30\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1584,
+        -384
+      ],
+      "id": "248f7846-f366-414c-a708-3bceb143969a",
+      "name": "Start generating the video",
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "ifcnl5gH2zExGGuq",
+          "name": "Google account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $('Configure me').item.json.API_ENDPOINT }}/v1/projects/{{ $('Configure me').item.json.PROJECT_ID }}/locations/{{ $('Configure me').item.json.LOCATION_ID }}/publishers/google/models/{{ $('Configure me').item.json.MODEL_ID }}:fetchPredictOperation",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  \"operationName\": $('Start generating the video').first().json.name\n}, null, 2) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1952,
+        -384
+      ],
+      "id": "1760124c-67d9-4066-992a-af0c8df97721",
+      "name": "Get the status of the generation",
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "ifcnl5gH2zExGGuq",
+          "name": "Google account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "5de4dcc5-afd1-49ab-aa0e-c2c6ecf247e1",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.done }}",
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3e1c0980-cfac-4b39-9741-03356bc9d85a",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        2192,
+        -384
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "response.videos[0].bytesBase64Encoded",
+        "options": {}
+      },
+      "id": "2060db30-1d7e-471f-a9ee-537f430f772b",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "position": [
+        2416,
+        -400
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1744,
+        -384
+      ],
+      "id": "26466e1d-ca2f-4524-8d8f-e68a1696cb12",
+      "name": "Initial wait",
+      "webhookId": "973ad659-e1ca-4daf-b6f6-bf6242cb4be2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2192,
+        -240
+      ],
+      "id": "6353738b-d85e-4c14-a7a8-0e6d4d1d8926",
+      "name": "Wait before polling again",
+      "webhookId": "d68106f3-971c-47b6-8800-e02a3e273b8c"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Persona:\nName: {{ $json.personas.name }}\nTone: {{ $json.personas.tone }}\nGoal: {{ $json.personas.goal }}",
+        "options": {
+          "systemMessage": "=You are a social media reel creator.\n\n\nJewelry description:\n{{ $json[\"analysis\"] }}\n\n\nCreate ONE 20–30 second reel script or master prompt with:\n1. Hook (first 3 seconds)\n2. Scene-by-scene visual instructions (3–5 shots)\n3. Voiceover or on-screen text\n4. Music mood suggestion\n5. Caption with hashtags\n6. Strong CTA\n\n\nMake it visually distinct and tailored only to this persona.\n\nOutput Format : \nNo double inverted commas \nNo new line \nJust Give Paragraph\ngive detailed prompt\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        832,
+        -384
+      ],
+      "id": "b0032897-13ed-4c2a-8986-c1e2d36c3bac",
+      "name": "Short Video Content"
+    },
+    {
+      "parameters": {
+        "content": "## Storage ",
+        "height": 560,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2688,
+        -464
+      ],
+      "typeVersion": 1,
+      "id": "498596aa-017a-49a8-9b2a-d25497a450f5",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const binary = $input.first().binary.image;\n\nreturn [\n  {\n    json: {\n      imageBase64: binary.data,      // already base64\n      mimeType: binary.mimeType      // image/jpeg or image/png\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        -384
+      ],
+      "id": "1511ed27-24d9-438c-96b9-3b1657ab8530",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.srv1241696.hstgr.cloud",
+            "user-agent": "pg_net/0.19.5",
+            "content-length": "769",
+            "accept": "*/*",
+            "content-type": "application/json",
+            "x-forwarded-for": "172.18.0.1",
+            "x-forwarded-host": "n8n.srv1241696.hstgr.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "85a76059f7f3",
+            "x-real-ip": "172.18.0.1",
+            "accept-encoding": "gzip"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "type": "INSERT",
+            "table": "objects",
+            "record": {
+              "id": "b0760729-45f0-49a6-ab01-e3383add4851",
+              "name": "jewellery-gold-image_16901904 (1).jpg",
+              "level": 1,
+              "owner": null,
+              "version": "56b27819-7f36-421e-86eb-328cf4e5df42",
+              "metadata": {
+                "eTag": "\"8d51aecce560987ed81446fae16808df-1\"",
+                "size": 28711,
+                "mimetype": "image/jpeg",
+                "cacheControl": "max-age=3600",
+                "lastModified": "2026-01-05T11:04:22.000Z",
+                "contentLength": 28711,
+                "httpStatusCode": 200
+              },
+              "owner_id": null,
+              "bucket_id": "image",
+              "created_at": "2026-01-05T11:04:22.193566+00:00",
+              "updated_at": "2026-01-05T11:04:22.193566+00:00",
+              "path_tokens": [
+                "jewellery-gold-image_16901904 (1).jpg"
+              ],
+              "user_metadata": null,
+              "last_accessed_at": "2026-01-05T11:04:22.193566+00:00"
+            },
+            "schema": "storage",
+            "old_record": null
+          },
+          "webhookUrl": "https://n8n.srv1241696.hstgr.cloud/webhook-test/0aa986e1-3e61-40a4-a12e-e93340f2f7d3",
+          "executionMode": "test"
+        }
+      }
+    ],
+    "Analyze an image": [
+      {
+        "json": {
+          "content": {
+            "parts": [
+              {
+                "text": "Of course. Here is a professional analysis of the jewelry set:\n\n**1. Jewelry Type**\nThis is a traditional Indian choker necklace set, featuring a wide, ornate collar piece with a prominent pendant and a pair of matching dangle earrings. The design is characteristic of South Indian \"Temple Jewellery,\" known for its inspiration from temple architecture and divine motifs.\n\n**2. Material & Color**\nThe set is crafted with a rich, antique gold finish. The color is a deep, burnished matte gold rather than a bright, polished yellow, which accentuates the incredibly detailed craftsmanship. This finish highlights the intricate floral and sunburst motifs, fine beadwork (ghungroos), and granulation.\n\n**3. Emotional Appeal**\nThis jewelry exudes a sense of timeless regality, heritage, and opulence. It feels both majestic and deeply spiritual, evoking a connection to tradition and ceremony. The weight and intricacy of the design convey a powerful sense of grace, status, and divine adornment.\n\n**4. Ideal Usage Occasion**\nThis is a quintessential statement piece for grand occasions. It is perfectly suited as bridal wear for a traditional wedding. It would also be an exquisite choice for major cultural festivals, religious functions, and formal family celebrations where making a grand, culturally-rich statement is desired."
+              }
+            ],
+            "role": "model"
+          },
+          "finishReason": "STOP",
+          "index": 0
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Short Video Content": [
+      {
+        "json": {
+          "output": "HOOK VISUAL: (0-3 seconds) Ultra close-up, soft focus shot of a single, brilliant facet of a diamond shimmering, or the smooth, iridescent curve of a pearl catching light, slowly panning. VOICEOVER/TEXT: This is more than jewelry. SHOT 1 VISUAL: (3-8 seconds) Elegant hand (manicured, perhaps with a delicate ring) gently reaching for a multi-piece bridal jewelry set (necklace, earrings, bracelet) lying on a luxurious silk or satin fabric, possibly near a wedding veil. Soft, dreamy lighting. VOICEOVER/TEXT: It's the whisper of forever, crafted just for you. SHOT 2 VISUAL: (8-13 seconds) The jewelry (e.g., necklace) delicately being fastened around a bride's neck from behind, showcasing the elegant updo and the back of a pristine wedding gown. Focus on the exquisite detail as it settles. VOICEOVER/TEXT: The radiant glow for your unforgettable day. SHOT 3 VISUAL: (13-18 seconds) A slow-motion, ethereal shot of the bride (profile or back to camera) standing gracefully, perhaps gazing out a softly lit window, light catching every sparkle of her jewelry as she subtly moves. Dreamy, cinematic quality. VOICEOVER/TEXT: Every facet, a promise. Every shimmer, a cherished memory. SHOT 4 VISUAL: (18-23 seconds) A grander shot showcasing the entire bridal jewelry collection beautifully displayed on a velvet bust or luxurious vanity, surrounded by delicate fresh flowers or subtle bridal accessories. Slow zoom into the most prominent piece. VOICEOVER/TEXT: Your ultimate bridal statement, timeless and brilliant. CTA VISUAL: (23-30 seconds) Elegant text overlay: Discover Your Dream. Followed by: [Your Brand Name] and Website/Instagram Handle. Jewelry continues to softly sparkle in the background. VOICEOVER/TEXT: Find the perfect piece that completes your dream. Link in bio to explore our exclusive bridal collection. MUSIC MOOD SUGGESTION: Elegant, orchestral, romantic, and slightly cinematic instrumental piece that builds gently. CAPTION: Your wedding day. A masterpiece of dreams, elegance, and everlasting love. Let your jewelry be the most exquisite chapter in your story, radiating a brilliance that mirrors your heart's deepest desires. We believe every Luxury Bride deserves to shine with a luminescence as profound as her love. Discover the heirloom-worthy pieces designed to transform your most beautiful day into an eternal sparkle. #LuxuryBride #BridalJewelryGoals #DreamWedding #ElegantBridal #WeddingDayGlow #HeirloomJewelry #BridalStatement #DiamondDreams #PearlPerfection #TimelessBride #EngagedLife #WeddingInspiration #BridalStyle #FutureMrs #LuxuryWedding #BridalDreams #ExquisiteJewelry. STRONG CTA: Discover your signature brilliance. Visit the link in bio to explore our curated bridal collection and begin your legacy of sparkle."
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "output": "REEL SCRIPT: This is your sign to level up! Music: Fast-paced, confident electro-pop beat with a trendy, slightly edgy vibe (e.g., viral sound). Hook (0-3s): QUICK cut sequence: Shot 1 (0-1s): Super close-up, shaky handheld POV shot of a trendy but simple outfit (e.g., plain tee, jeans) with a voiceover saying Whoops! Missing something? Shot 2 (1-3s): A hand dramatically grabs a statement jewelry piece off a sleek display, glinting as it catches the light. Visuals & Voiceover/On-Screen Text (3-20s): Shot 3 (3-8s): Fast-paced montage of the jewelry being put on: fingers expertly clasping a chunky necklace, stacking bold rings, or slipping on edgy earrings. Voiceover: Your outfit's fire, but this? This makes it iconic. On-screen text flashes: INSTANT VIBE. Shot 4 (8-15s): Dynamic full-body shot of the Gen Z Trendsetter striking a confident, playful pose, showcasing the jewelry as the focal point. Quick transitions, multiple angles (low angle looking up, mid-shot zoom on the jewelry). Voiceover: Stop blending in, start making *the* statement. Shot 5 (15-20s): Close-up, high-definition shot of the jewelry itself, perhaps with a subtle sparkle effect or a slow pan across its details. On-screen text: EFFORTLESSLY BOLD. Caption & CTA (20-30s): Shot 6 (20-30s): Trendsetter winks at the camera, then confidently walks away, the jewelry subtly glinting. Voiceover: Don't just follow trends, *start* them. Caption: Your feed just got a major upgrade. Seriously obsessed with how this piece takes every outfit from 'cute' to *iconic*. It's not just jewelry, it's the whole vibe. Get ready to turn heads! #GenZFashion #TrendsetterVibes #StatementJewelry #AccessorizeIt #MustHave #OOTDJewelry #FashionForward #StyleGoals. Strong CTA: Tap the link in bio to snag your new obsession before everyone else does!"
+        },
+        "pairedItem": {
+          "item": 1
+        }
+      },
+      {
+        "json": {
+          "output": "Hook: Close-up of delicate, minimalist gold stud earrings or a thin chain necklace with a tiny, refined pendant, catching the light as the wearer subtly turns their head. Scene-by-scene Visuals & Voiceover/On-Screen Text: Shot 1 (0-3s): Gentle zoom out from the delicate gold piece worn against a crisp white shirt. Voiceover: Some pieces just click. Shot 2 (3-9s): Mid-shot of a minimalist professional working at a clean, well-lit desk, typing on a laptop; her hand occasionally rests near the jewelry, making it subtly visible. Voiceover: For the professional who values understated elegance. Shot 3 (9-15s): Scene transition to her walking confidently in an urban, modern setting or holding a minimalist coffee cup; the jewelry remains a consistent, subtle accent to her chic, tailored outfit. Voiceover: Designed to seamlessly transition from boardrooms to brunch. Shot 4 (15-20s): Close-up of the jewelry piece again, perhaps layered with one other similar delicate piece or styled on a different, equally chic outfit, focusing on the premium finish and subtle glow. On-screen text: Your daily dose of distinction. Shot 5 (20-25s): Final shot of the professional smiling subtly, confident, with the jewelry clearly visible, followed by a clean product shot. Music Mood: Calm, sophisticated jazz instrumental with a subtle, uplifting beat or elegant, minimalist ambient electronic. Caption: Discover the quiet luxury that defines your professional style. Our exquisite new collection is crafted for the discerning minimalist who believes true elegance lies in the details. Effortless, timeless, perfectly you. #MinimalistJewelry #ProfessionalStyle #EverydayElegance #QuietLuxury #WorkwearJewelry #ClassyJewelry #TimelessDesign #RefinedStyle. Strong CTA: Tap the link in bio to shop your next everyday essential."
+        },
+        "pairedItem": {
+          "item": 2
+        }
+      },
+      {
+        "json": {
+          "output": "Create a 25-second social media reel for Festive Buyers, resonating with cultural and emotional ties to festival and tradition. The reel opens with a captivating hook: a slow pan over a beautifully adorned puja thali with glowing diyas and fresh flowers, shifting focus to elegant hands gently opening a rich velvet jewelry box to reveal a magnificent traditional gold necklace with intricate filigree and Kundan detailing (0-3s), while a warm voiceover begins, 'Some traditions are etched in gold...'. The scene transitions to a close-up of the necklace being carefully lifted from its box, showcasing its craftsmanship and the radiant sparkle of its elements, draped delicately on a vibrant silk saree, reinforcing the voiceover's continuation: '...a legacy passed down through generations' (3-10s). Next, a graceful woman is seen adorning herself with the necklace, perhaps in a mirror's reflection, her face lighting up with a confident and serene smile that reflects cultural pride, as the voiceover adds, 'Adorn yourself with the timeless elegance that celebrates your roots' (10-18s). The fourth shot captures her participating in a joyful festive moment, perhaps lighting another diya or offering prayers, the necklace a prominent yet harmonious part of her radiant festive attire, embodying the voiceover: 'Feel the warmth of heritage, the glow of festivities' (18-25s). The reel concludes with a quick visual montage of the necklace's most exquisite details, followed by vibrant on-screen text appearing: 'Celebrate Tradition. Shop [Brand Name] Today!', ensuring a strong call to action (25-30s). The entire reel is underscored by uplifting, traditional Indian instrumental music, featuring light sitar, flute, and tabla, creating a warm, nostalgic, and joyful atmosphere. The accompanying caption for the reel reads: 'Let your festive spirit shine bright with a piece that tells a story. This isn't just jewelry; it's a cherished memory, a blessing, a touch of heritage for every celebration. Embrace the beauty of tradition this festive season!', followed by relevant hashtags: #FestiveJewelry #CulturalHeritage #TraditionalGold #IndianJewelry #FestivalVibes #HeirloomJewelry #CelebrateWithGold #EternalTradition #FestivalFashion #EthicalJewelry #JoyfulAdornment #[BrandName]Jewels. The ultimate call to action is to 'Discover your festive elegance. Visit [Your Website/Store Link] now!'."
+        },
+        "pairedItem": {
+          "item": 3
+        }
+      },
+      {
+        "json": {
+          "output": "REEL SCRIPT: A male gift buyer's emotional journey to the perfect gift for the Eternal Sparkle Pendant Necklace. HOOK (0-3s): VISUAL: A man (early 30s-40s, thoughtful expression) sits at a desk, looking slightly overwhelmed, scrolling through his phone, perhaps with a calendar visible in the background hinting at an upcoming occasion; ON-SCREEN TEXT dynamically appears, stating Still searching for THE gift?; VOICE OVER (calm, reassuring male voice): Feeling the pressure to find something truly special? SCENE 1 (3-8s): VISUAL: A quick cut reveals a close-up of the Eternal Sparkle Pendant Necklace nestled in an open, elegant gift box, glinting subtly, with focus on the delicate chain and brilliant solitaire; VOICE OVER: You want a gift that speaks from the heart, a piece that celebrates your unique bond. SCENE 2 (8-15s): VISUAL: A woman's hand (implied recipient) gently touches the pendant as it rests against her collarbone, her face out of frame, but her posture and lingering fingers convey warmth and appreciation under soft, warm lighting; VOICE OVER: Our Eternal Sparkle Pendant isn't just beautiful; it's a quiet promise, a cherished memory she can wear close, every single day. SCENE 3 (15-22s): VISUAL: The man from the hook, now smiling genuinely, gently closes the gift box and places it into a luxurious gift bag, looking confident and content; ON-SCREEN TEXT overlays, saying Gift with confidence; VOICE OVER: Crafted to capture her heart, designed to remind her of your unwavering thoughtfulness. This isn't just a present; it's a profound declaration. MUSIC MOOD: Gentle, heartwarming instrumental music with a subtle build-up, perhaps soft acoustic guitar or piano that evokes warmth and sincerity. CAPTION: Choosing the perfect gift can be daunting, but it doesn’t have to be. For the man who wants to express love, gratitude, or celebrate a milestone with unparalleled elegance, our Eternal Sparkle Pendant Necklace is more than jewelry—it's a moment, an emotion, an everlasting memory. Make her eyes sparkle with joy, a reflection of your profound care. #PerfectGiftForHer #ThoughtfulGifts #JewelryForHer #GiftIdeasForWomen #MeaningfulGifts #EternalSparkle #CelebrateLove #GiftWithConfidence STRONG CTA: Swipe up or visit the link in bio to discover the Eternal Sparkle Pendant and make her next occasion unforgettable."
+        },
+        "pairedItem": {
+          "item": 4
+        }
+      }
+    ],
+    "Start generating the video": [
+      {
+        "json": {
+          "name": "projects/gen-lang-client-0494102051/locations/us-central1/publishers/google/models/veo-3.1-generate-preview/operations/d71d3625-d0fe-423a-81d4-b39e9f7c4b40"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "name": "projects/gen-lang-client-0494102051/locations/us-central1/publishers/google/models/veo-3.1-generate-preview/operations/702a447d-87a9-4a79-9433-ad0dd566d948"
+        },
+        "pairedItem": {
+          "item": 1
+        }
+      },
+      {
+        "json": {
+          "name": "projects/gen-lang-client-0494102051/locations/us-central1/publishers/google/models/veo-3.1-generate-preview/operations/c732c38e-9889-4f20-a943-2091a0b2e653"
+        },
+        "pairedItem": {
+          "item": 2
+        }
+      },
+      {
+        "json": {
+          "name": "projects/gen-lang-client-0494102051/locations/us-central1/publishers/google/models/veo-3.1-generate-preview/operations/4028603d-495e-46a1-a4e8-1d4b1d87e628"
+        },
+        "pairedItem": {
+          "item": 3
+        }
+      },
+      {
+        "json": {
+          "name": "projects/gen-lang-client-0494102051/locations/us-central1/publishers/google/models/veo-3.1-generate-preview/operations/179c8bbf-0515-4211-9266-c53658b3ed3e"
+        },
+        "pairedItem": {
+          "item": 4
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Short Video Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Short Video Content",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup workflow": {
+      "main": [
+        [
+          {
+            "node": "Start generating the video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configure me": {
+      "main": [
+        [
+          {
+            "node": "Setup workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the status of the generation": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait before polling again",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Initial wait": {
+      "main": [
+        [
+          {
+            "node": "Get the status of the generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait before polling again": {
+      "main": [
+        [
+          {
+            "node": "Initial wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start generating the video": {
+      "main": [
+        [
+          {
+            "node": "Initial wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Short Video Content": {
+      "main": [
+        [
+          {
+            "node": "Configure me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "543c030e-2661-47fd-a40f-69f9eea3d95f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fc3412a0986fd9da2be403eaff9ca443fdab3b31644b356e92cd3a7b350bc54b"
+  },
+  "id": "aWma6oQaQ0G8by6Q",
+  "tags": []
+}
