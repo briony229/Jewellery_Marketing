@@ -1,0 +1,356 @@
+{
+  "name": "Image Generation-JM-PS",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "0aa986e1-3e61-40a4-a12e-e93340f2f7d3",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1280,
+        256
+      ],
+      "id": "f7d21154-9c0a-4bb2-9742-17625fe51a81",
+      "name": "Webhook",
+      "webhookId": "0aa986e1-3e61-40a4-a12e-e93340f2f7d3"
+    },
+    {
+      "parameters": {
+        "url": "=https://bcbpwpqknmmexkigsxpm.supabase.co/storage/v1/object/public/image/{{ $json.body.record.name }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "image"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1088,
+        256
+      ],
+      "id": "1e84d1ec-7efa-4aea-8708-2192b2d50011",
+      "name": "Get Image"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro"
+        },
+        "text": "=You are a luxury jewelry visual analyst and brand copy specialist.\n\nYou are given a jewelry product image.\n\nYour task:\nVisually analyze the jewelry in the image with a brand and marketing mindset and produce a SHORT, IMPACTFUL, and PREMIUM description of the jewelry.\n\nANALYSIS REQUIREMENTS:\n• Identify the type of jewelry (ring, necklace, bracelet, earrings, etc.)\n• Observe material, color, finish, and craftsmanship\n• Capture the overall vibe (luxury, minimal, modern, traditional, bold, elegant)\n• Translate visual details into emotional and aspirational language\n\nOUTPUT RULES:\n• Description must be 5-6 sentences only\n• Language must be premium, elegant, and brand-ready\n• No emojis\n• No pricing, offers, or CTAs\n• No assumptions beyond what is visually evident\n• Avoid generic phrases like “perfect for every occasion”\n• Sound human, not AI-generated\n\nSTYLE:\n• Crisp\n• Sophisticated\n• High-end jewelry brand tone\n• Suitable hero  for website section or social media caption\n\n",
+        "inputType": "binary",
+        "binaryPropertyName": "image",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -880,
+        256
+      ],
+      "id": "3681eb5a-1cfb-46b5-9b30-de38f6d23670",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "EiV9BLBLpTSPEXh1",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a luxury jewelry campaign creative director.\n\nUsing the jewelry description below, generate EXACTLY 10 different AI image prompts.\n\nRules:\n• SAME jewelry in every image\n• Each prompt must show a DIFFERENT angle, pose, or aesthetic\n• Include:\n  - Model wearing the jewelry\n  - Close-up craftsmanship shot\n  - Side profile angle\n  - Flat lay luxury shot\n  - Editorial fashion shoot\n  - Traditional Indian bridal aesthetic\n  - Modern minimalist studio look\n  - Outdoor natural light shot\n  - Dark moody luxury lighting\n  - High-fashion magazine cover style\n• Ultra-realistic\n• Premium jewelry brand quality\n• Photorealistic\n• High detail, professional lighting\n\nIMPORTANT OUTPUT FORMAT:\nReturn ONLY valid JSON.\nNo text. No explanation. No markdown.\n\nJSON FORMAT:\n[\n  { \"prompt\": \"...\" },\n  { \"prompt\": \"...\" }\n]\n\nJewelry description:\n{{ $json.description }}\n",
+        "options": {
+          "systemMessage": "Analyze the jewelry image provided and extract detailed information:\n- Type of jewelry (necklace, ring, earrings, bracelet, etc.)\n- Materials (gold, silver, platinum, gemstones, diamonds)\n- Style (modern, vintage, classic, minimalist, ornate)\n- Colors and key design features\n- Size and scale\n\nReturn this information in a structured format that can be used to generate promotional images."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -640,
+        256
+      ],
+      "id": "bb18ea92-4cfa-414d-bb57-d9e95453306a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        432
+      ],
+      "id": "370ad82e-816c-4207-af96-b282223dc70e",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "EiV9BLBLpTSPEXh1",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get jewelry description from AI Agent\nconst jewelryDescription = $input.first().json.output;\n\n// Get the original image URL from \"Get Image\" node\nconst getImageOutput = $('Get Image').first().json;\nconst originalImageUrl = getImageOutput.URL; // Note: Capital URL based on your output\n\nconsole.log(\"Image URL:\", originalImageUrl); // Debug line\n\n// Define 10 different prompt variations\nconst prompts = [\n  {\n    id: 1,\n    prompt: `Professional jewelry product photography of THIS EXACT jewelry piece shown in the reference image, extreme close-up front view, pure white background, studio lighting, macro lens, commercial photography, high resolution, sharp focus. Keep the exact same design, materials, and gemstones.`\n  },\n  {\n    id: 2,\n    prompt: `Elegant fashion model wearing THIS EXACT jewelry piece from reference image, front portrait view, soft smile, professional makeup, studio setting, luxury fashion photography, vogue style, dramatic lighting. Jewelry must be identical to reference.`\n  },\n  {\n    id: 3,\n    prompt: `Side profile of model wearing THIS EXACT jewelry piece, elegant pose, jewelry clearly visible from side angle, soft natural lighting, clean background, fashion editorial style. Maintain exact jewelry design.`\n  },\n  {\n    id: 4,\n    prompt: `Over-the-shoulder glamour shot, model wearing THIS EXACT jewelry piece from reference, jewelry prominently displayed, bokeh background, golden hour lighting, lifestyle fashion photography. Keep design identical.`\n  },\n  {\n    id: 5,\n    prompt: `Close-up of elegant hands, model wearing THIS EXACT jewelry piece, manicured nails, soft lighting, white marble surface, luxury product photography. Match reference jewelry exactly.`\n  },\n  {\n    id: 6,\n    prompt: `Full body editorial fashion shot, professional model wearing THIS EXACT jewelry piece, elegant pose, high-end fashion studio, dramatic rim lighting, vogue magazine style. Keep jewelry identical.`\n  },\n  {\n    id: 7,\n    prompt: `Lifestyle shot, model wearing THIS EXACT jewelry piece in modern luxury setting, natural daylight, candid moment, bokeh background, lifestyle fashion photography. Jewelry must match reference.`\n  },\n  {\n    id: 8,\n    prompt: `Dramatic jewelry advertisement, model wearing THIS EXACT jewelry piece, low key lighting, black background, spotlight on jewelry, high contrast, luxury brand campaign style. Maintain exact design.`\n  },\n  {\n    id: 9,\n    prompt: `Flat lay product photography, THIS EXACT jewelry piece on luxurious velvet fabric, top-down view, soft shadows, professional product photography. Keep jewelry identical to reference.`\n  },\n  {\n    id: 10,\n    prompt: `Extreme macro detail shot of THIS EXACT jewelry piece, showcasing craftsmanship and intricate details, professional product photography, shallow depth of field, artistic lighting. Match reference exactly.`\n  }\n];\n\n// Strong negative prompt\nconst negativePrompt = \"different jewelry, altered design, modified jewelry, wrong style, changed materials, different gemstones, deformed, distorted, low quality, blurry, amateur, watermark, text, signature\";\n\n// Format output with image reference\nreturn prompts.map(item => ({\n  json: {\n    promptId: item.id,\n    prompt: item.prompt,\n    negativePrompt: negativePrompt,\n    jewelryInfo: jewelryDescription,\n    referenceImageUrl: originalImageUrl,\n    imageFileName: getImageOutput[\"File Name\"] || \"jewelry-image.jpg\"\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -304,
+        256
+      ],
+      "id": "d4e208da-8f37-4d33-8e58-4c0604b0c147",
+      "name": "Generate 10 Prompts"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "edit",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash-image",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash-image (Nano Banana)"
+        },
+        "prompt": "=={{ $json.prompt }}\n\nGenerate a photorealistic image based on this description. Make it high quality, professional, and suitable for jewelry advertising.",
+        "images": {
+          "values": [
+            {
+              "binaryPropertyName": "image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        128,
+        256
+      ],
+      "id": "6fe55752-8d1d-4954-b70e-cbeb1597100e",
+      "name": "Edit an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "EiV9BLBLpTSPEXh1",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://bcbpwpqknmmexkigsxpm.supabase.co/storage/v1/object/public/image/{{ $('Webhook').item.json.body.record.name }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "image"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -96,
+        256
+      ],
+      "id": "d91390b5-8d36-40d3-9322-af1a35d24a8f",
+      "name": "Get Image1"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.srv1241696.hstgr.cloud",
+            "user-agent": "pg_net/0.19.5",
+            "content-length": "769",
+            "accept": "*/*",
+            "content-type": "application/json",
+            "x-forwarded-for": "172.18.0.1",
+            "x-forwarded-host": "n8n.srv1241696.hstgr.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "85a76059f7f3",
+            "x-real-ip": "172.18.0.1",
+            "accept-encoding": "gzip"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "type": "INSERT",
+            "table": "objects",
+            "record": {
+              "id": "b0760729-45f0-49a6-ab01-e3383add4851",
+              "name": "jewellery-gold-image_16901904 (1).jpg",
+              "level": 1,
+              "owner": null,
+              "version": "56b27819-7f36-421e-86eb-328cf4e5df42",
+              "metadata": {
+                "eTag": "\"8d51aecce560987ed81446fae16808df-1\"",
+                "size": 28711,
+                "mimetype": "image/jpeg",
+                "cacheControl": "max-age=3600",
+                "lastModified": "2026-01-05T11:04:22.000Z",
+                "contentLength": 28711,
+                "httpStatusCode": 200
+              },
+              "owner_id": null,
+              "bucket_id": "image",
+              "created_at": "2026-01-05T11:04:22.193566+00:00",
+              "updated_at": "2026-01-05T11:04:22.193566+00:00",
+              "path_tokens": [
+                "jewellery-gold-image_16901904 (1).jpg"
+              ],
+              "user_metadata": null,
+              "last_accessed_at": "2026-01-05T11:04:22.193566+00:00"
+            },
+            "schema": "storage",
+            "old_record": null
+          },
+          "webhookUrl": "https://n8n.srv1241696.hstgr.cloud/webhook-test/0aa986e1-3e61-40a4-a12e-e93340f2f7d3",
+          "executionMode": "test"
+        }
+      }
+    ],
+    "Analyze an image": [
+      {
+        "json": {
+          "content": {
+            "parts": [
+              {
+                "text": "Behold a masterpiece of artisanal splendor, meticulously crafted into a grand choker and earring set. Rendered in a burnished antique gold, the design is an opulent celebration of traditional craftsmanship. A magnificent, sun-inspired medallion serves as the breathtaking centerpiece, radiating with detailed texture. Intricate layers and delicate dangling beads create a piece with captivating dimension and graceful movement. The matching earrings perfectly echo the necklace's regal motifs for a harmonious statement. This is not merely adornment, but a wearable heirloom of timeless elegance."
+              }
+            ],
+            "role": "model"
+          },
+          "finishReason": "STOP",
+          "index": 0
+        }
+      }
+    ],
+    "AI Agent": [
+      {
+        "json": {
+          "output": "```json\n[\n  {\n    \"prompt\": \"Ultra-realistic, photorealistic, premium jewelry brand quality, high detail, professional lighting. A stunning female model with elegant posture, wearing a breathtaking 18k white gold statement necklace featuring a large, vibrant sapphire as its central focal point, surrounded by a halo of brilliant-cut D color VS1 clarity diamonds. The delicate chain is intricately detailed with smaller pavé-set diamonds, showcasing the necklace gracefully draped around her neck.\"\n  },\n  {\n    \"prompt\": \"Ultra-realistic, photorealistic, premium jewelry brand quality, high detail, professional lighting, macro shot. A detailed close-up of the 18k white gold statement necklace, focusing on the intricate craftsmanship of the setting for the vibrant sapphire and its surrounding brilliant-cut D color VS1 clarity diamond halo. Showcase the delicate pavé-set diamonds on the chain and the precise filigree work, highlighting every facet and reflection.\"\n  },\n  {\n    \"prompt\": \"Ultra-realistic, photorealistic, premium jewelry brand quality, high detail, professional lighting. A female model in a sophisticated pose, captured from a side profile angle, wearing the 18k white gold statement necklace with a large vibrant sapphire and brilliant-cut D color VS1 clarity diamonds. The shot emphasizes how the necklace sits and drapes, revealing its depth and dimension against her neck and décolletage.\"\n  },\n  {\n    \"prompt\": \"Ultra-realistic, photorealistic, premium jewelry brand quality, high detail, professional lighting. A luxurious flat lay arrangement featuring the 18k white gold statement necklace with its vibrant sapphire and brilliant-cut D color VS1 clarity diamonds. The necklace is elegantly placed on a rich silk fabric, accompanied by other high-end items like a designer perfume bottle, an antique watch, and fresh exotic flowers, viewed from directly above.\"\n  },\n  {\n    \"prompt\": \"Ultra-realistic, photorealistic, premium jewelry brand quality, high detail, professional lighting. An editorial fashion shoot featuring a high-fashion model with dramatic styling and a powerful gaze, wearing the 18k white gold statement necklace with a large vibrant sapphire and brilliant-cut D color VS1 clarity diamonds. Dynamic composition, avant-garde attire, and artistic lighting create a compelling visual narrative.\"\n  },\n  {\n    \"prompt\": \"Ultra-realistic, photorealistic, premium jewelry brand quality, high detail, professional lighting. A traditional Indian bridal aesthetic, showcasing a radiant bride adorned in elaborate bridal attire and traditional jewelry, with the 18k white gold statement necklace featuring a large vibrant sapphire and brilliant-cut D color VS1 clarity diamonds as a prominent part of her ensemble. Rich colors, intricate patterns, and warm, celebratory lighting.\"\n  },\n  {\n    \"prompt\": \"Ultra-realistic, photorealistic, premium jewelry brand quality, high detail, professional lighting. A modern minimalist studio look. A female model with clean styling and a neutral expression, wearing the 18k white gold statement necklace with a large vibrant sapphire and brilliant-cut D color VS1 clarity diamonds, against a stark white or light grey seamless background. Emphasize clean lines and the inherent beauty of the jewelry with subtle, focused lighting.\"\n  },\n  {\n    \"prompt\": \"Ultra-realistic, photorealistic, premium jewelry brand quality, high detail, professional lighting. An outdoor natural light shot. A female model wearing the 18k white gold statement necklace with a large vibrant sapphire and brilliant-cut D color VS1 clarity diamonds, positioned in a lush garden setting or by a serene natural landscape. Soft, golden hour sunlight illuminates the necklace and model, creating an ethereal and elegant glow.\"\n  },\n  {\n    \"prompt\": \"Ultra-realistic, photorealistic, premium jewelry brand quality, high detail, professional lighting. Dark moody luxury lighting. A mysterious and opulent shot of a female model wearing the 18k white gold statement necklace with a large vibrant sapphire and brilliant-cut D color VS1 clarity diamonds. Deep shadows and dramatic spotlights highlight the sparkle of the diamonds and the rich color of the sapphire against a dark, luxurious backdrop.\"\n  },\n  {\n    \"prompt\": \"Ultra-realistic, photorealistic, premium jewelry brand quality, high detail, professional lighting. High-fashion magazine cover style. A striking close-up of a glamorous female model's face and décolletage, featuring the 18k white gold statement necklace with a large vibrant sapphire and brilliant-cut D color VS1 clarity diamonds prominently. Intense gaze, flawless makeup, and powerful composition suitable for a luxury fashion magazine cover.\"\n  }\n]\n```"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Generate 10 Prompts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate 10 Prompts": {
+      "main": [
+        [
+          {
+            "node": "Get Image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image1": {
+      "main": [
+        [
+          {
+            "node": "Edit an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit an image": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "5019c397-f2ca-4005-91da-00b21797bf0e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fc3412a0986fd9da2be403eaff9ca443fdab3b31644b356e92cd3a7b350bc54b"
+  },
+  "id": "0mPyuS83SwX1WZMS",
+  "tags": []
+}
